@@ -14,6 +14,7 @@ use Nette\DI\Helpers;
 use Nette\DI\Statement;
 use Nette\PhpGenerator\ClassType;
 use Nextras\TracyMonologAdapter\Logger;
+use Nextras\TracyMonologAdapter\Processors\TracyBlueScreenProcessor;
 use Nextras\TracyMonologAdapter\Processors\TracyExceptionProcessor;
 use Tracy\Debugger;
 
@@ -36,9 +37,13 @@ class MonologExtension extends CompilerExtension
 				->setArguments([$logDir . '/nette.log'])
 				->setAutowired(false);
 
+			$builder->addDefinition($this->prefix('tracyBlueScreenProcessor'))
+				->setClass(TracyBlueScreenProcessor::class)
+				->setArguments([$logDir, '@Tracy\BlueScreen'])
+				->setAutowired(false);
+
 			$builder->addDefinition($this->prefix('tracyExceptionProcessor'))
 				->setClass(TracyExceptionProcessor::class)
-				->setArguments([$logDir, '@Tracy\BlueScreen'])
 				->setAutowired(false);
 
 			$monologLogger = $builder->addDefinition($this->prefix('monologLogger'))
@@ -46,6 +51,7 @@ class MonologExtension extends CompilerExtension
 				->setArguments(['nette'])
 				->addSetup('pushHandler', ['@' . $this->prefix('handler')])
 				->addSetup('pushProcessor', ['@' . $this->prefix('tracyExceptionProcessor')])
+				->addSetup('pushProcessor', ['@' . $this->prefix('tracyBlueScreenProcessor')])
 				->setAutowired(false);
 		}
 

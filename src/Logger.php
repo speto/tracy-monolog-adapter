@@ -8,6 +8,7 @@
 namespace Nextras\TracyMonologAdapter;
 
 use Monolog;
+use Nextras\TracyMonologAdapter\Processors\TracyExceptionProcessor;
 use Throwable;
 use Tracy\Helpers;
 use Tracy\ILogger;
@@ -43,7 +44,7 @@ class Logger implements ILogger
 
 		if ($message instanceof Throwable) {
 			$context['exception'] = $message;
-			$message = '';
+			$message = TracyExceptionProcessor::formatMessage($message);
 		}
 
 		$this->monolog->addRecord(
